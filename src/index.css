@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background-color: #0f172a; /* slate-900 */
+  color: #f8fafc; /* slate-50 */
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Custom Animations used in App.tsx */
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(100%); }
+}
