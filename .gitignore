@@ -31,3 +31,4 @@ dist-ssr
 # Generated output files (MulmoCast)
 output/
 test-movie-generation.js
+test-answer-reflection.js

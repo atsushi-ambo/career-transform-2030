@@ -1047,8 +1047,8 @@ export default function App() {
     handleAnswer();
   };
 
-  // MulmoScript JSONを生成する関数（レート制限対策: 2画像のみ）
-  const generateMulmoScript = (offer: JobOffer, profile: UserProfile) => {
+  // MulmoScript JSONを生成する関数（ユーザーの回答を反映）
+  const generateMulmoScript = (offer: JobOffer, profile: UserProfile, answers?: string[]) => {
     const mulmoScript = {
       "$mulmocast": { "version": "1.0" },
       "canvasSize": { "width": 1920, "height": 1080 },
@@ -1106,6 +1106,22 @@ export default function App() {
               Aspect ratio: 16:9.`
           }
         },
+        ...(answers && answers.length > 0 ? [{
+          "text": `あなたが示した判断力：${answers.slice(0, 2).map((a, i) => `「${currentScenarios[i]?.context}」では${a.slice(0, 30)}...`).join('、')}`,
+          "htmlPrompt": {
+            "prompt": `Create a decision-making journey visualization for a career simulation.
+              Context: This person made critical decisions in future scenarios.
+              Scenario 1 (${currentScenarios[0]?.context || '2026'}): "${answers[0]?.slice(0, 100) || 'Decision made'}"
+              Scenario 2 (${currentScenarios[1]?.context || '2028'}): "${answers[1]?.slice(0, 100) || 'Decision made'}"
+
+              Style: Timeline or mind-map showing decision points
+              Include: Brain/neural network visualization, branching paths, decision nodes glowing,
+              abstract representations of choices made, data flowing through decision trees
+              Color scheme: Purple to blue gradient, glowing decision points
+              Mood: Analytical, intelligent, strategic thinking
+              Aspect ratio: 16:9, cinematic.`
+          }
+        }] : []),
         {
           "text": `日々の業務: ${offer.dailyTask}`,
           "htmlPrompt": {
@@ -1151,7 +1167,7 @@ export default function App() {
     }
 
     try {
-      const mulmoScript = generateMulmoScript(jobOffer, userProfile);
+      const mulmoScript = generateMulmoScript(jobOffer, userProfile, scenarioAnswers);
 
       // Progress simulation while waiting for API
       const progressInterval = setInterval(() => {
@@ -1211,7 +1227,7 @@ export default function App() {
     }
 
     try {
-      const mulmoScript = generateMulmoScript(jobOffer, userProfile);
+      const mulmoScript = generateMulmoScript(jobOffer, userProfile, scenarioAnswers);
 
       // Progress simulation while waiting for API
       const progressInterval = setInterval(() => {
