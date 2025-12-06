@@ -17,7 +17,16 @@ import {
   Server,
   User,
   Code,
-  Target
+  Target,
+  Download,
+  Film,
+  Loader2,
+  ImageIcon,
+  Play,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 
 /**
@@ -48,28 +57,135 @@ type Scenario = {
   targetMetric: keyof FutureMetrics;
 };
 
-const PROFILE_QUESTIONS = [
-  {
-    id: 'currentRole',
-    icon: User,
-    question: "現在の職種・役職を教えてください",
-    placeholder: "例: バックエンドエンジニア、プロジェクトマネージャー",
-    examples: ["エンジニア", "PM", "デザイナー", "営業"]
+// 職種選択の質問（最初の質問）
+const ROLE_QUESTION = {
+  id: 'currentRole',
+  icon: User,
+  question: "現在の職種・役職を教えてください",
+  placeholder: "例: バックエンドエンジニア、プロジェクトマネージャー",
+  examples: ["エンジニア", "PM", "デザイナー", "営業", "マーケター", "コンサルタント"]
+};
+
+// 職種ごとのスキル質問設定
+const ROLE_SPECIFIC_QUESTIONS: Record<string, {
+  skills: { question: string; placeholder: string; examples: string[] };
+  careerGoal: { question: string; placeholder: string; examples: string[] };
+}> = {
+  "エンジニア": {
+    skills: {
+      question: "得意な技術スタック・言語は何ですか？",
+      placeholder: "例: Python, TypeScript, Go, Kubernetes",
+      examples: ["Python", "TypeScript", "Go", "React", "Rust", "AWS"]
+    },
+    careerGoal: {
+      question: "エンジニアとして2030年にどうなっていたい？",
+      placeholder: "例: アーキテクトとして大規模システムを設計したい",
+      examples: ["技術を極めたい", "CTOになりたい", "OSS開発に専念したい", "AI×インフラを極めたい"]
+    }
   },
-  {
-    id: 'skills',
-    icon: Code,
-    question: "得意なスキル・技術は何ですか？",
-    placeholder: "例: Python, AWS, チームマネジメント",
-    examples: ["Python", "React", "マネジメント", "データ分析"]
+  "PM": {
+    skills: {
+      question: "PMとしての強み・得意領域は？",
+      placeholder: "例: アジャイル開発、ステークホルダー調整",
+      examples: ["アジャイル", "ロードマップ策定", "データ分析", "UXリサーチ", "技術理解"]
+    },
+    careerGoal: {
+      question: "PMとして2030年にどうなっていたい？",
+      placeholder: "例: CPOとしてプロダクト戦略を統括したい",
+      examples: ["CPOになりたい", "新規事業立ち上げ", "グローバル展開", "AI プロダクト特化"]
+    }
   },
-  {
-    id: 'careerGoal',
-    icon: Target,
-    question: "2030年、どんな働き方をしていたいですか？",
-    placeholder: "例: AIと協働しながら新規事業を立ち上げたい",
-    examples: ["技術を極めたい", "経営に関わりたい", "自由に働きたい", "社会課題を解決したい"]
+  "デザイナー": {
+    skills: {
+      question: "デザインの得意分野・ツールは？",
+      placeholder: "例: UI/UX、Figma、ブランディング",
+      examples: ["UI/UX", "Figma", "グラフィック", "モーション", "プロトタイピング"]
+    },
+    careerGoal: {
+      question: "デザイナーとして2030年にどうなっていたい？",
+      placeholder: "例: デザインシステムを統括するリードデザイナー",
+      examples: ["CDOになりたい", "デザインシステム構築", "AI×デザイン", "クリエイティブディレクター"]
+    }
+  },
+  "営業": {
+    skills: {
+      question: "営業としての強み・経験領域は？",
+      placeholder: "例: エンタープライズ営業、SaaS、新規開拓",
+      examples: ["エンタープライズ", "新規開拓", "インサイドセールス", "カスタマーサクセス"]
+    },
+    careerGoal: {
+      question: "営業として2030年にどうなっていたい？",
+      placeholder: "例: CROとして営業組織を統括したい",
+      examples: ["CROになりたい", "グローバル営業", "AI活用で効率化", "戦略立案側"]
+    }
+  },
+  "マーケター": {
+    skills: {
+      question: "マーケティングの得意分野は？",
+      placeholder: "例: グロースハック、SEO、データ分析",
+      examples: ["グロースハック", "SEO", "SNS運用", "データ分析", "ブランディング"]
+    },
+    careerGoal: {
+      question: "マーケターとして2030年にどうなっていたい？",
+      placeholder: "例: CMOとして事業成長を牽引したい",
+      examples: ["CMOになりたい", "グローバル展開", "AI×マーケ", "データドリブン経営"]
+    }
+  },
+  "コンサルタント": {
+    skills: {
+      question: "コンサルティングの専門領域は？",
+      placeholder: "例: 戦略、IT、組織変革、財務",
+      examples: ["戦略", "IT", "組織変革", "DX", "M&A"]
+    },
+    careerGoal: {
+      question: "コンサルタントとして2030年にどうなっていたい？",
+      placeholder: "例: パートナーとして大型案件をリードしたい",
+      examples: ["パートナー昇格", "独立起業", "事業会社CxO", "AI戦略特化"]
+    }
+  },
+  // デフォルト（その他の職種）
+  "default": {
+    skills: {
+      question: "得意なスキル・専門領域は何ですか？",
+      placeholder: "例: データ分析、プロジェクトマネジメント、企画立案",
+      examples: ["データ分析", "企画立案", "チームマネジメント", "業務改善"]
+    },
+    careerGoal: {
+      question: "2030年、どんな働き方をしていたいですか？",
+      placeholder: "例: AIと協働しながら新規事業を立ち上げたい",
+      examples: ["専門性を極めたい", "経営に関わりたい", "起業したい", "社会課題解決"]
+    }
   }
+};
+
+// 職種に応じた質問を取得する関数
+const getQuestionsForRole = (role: string) => {
+  // 職種名に含まれるキーワードでマッチング
+  const roleLower = role.toLowerCase();
+
+  let roleKey = "default";
+  if (roleLower.includes("エンジニア") || roleLower.includes("engineer")) {
+    roleKey = "エンジニア";
+  } else if (roleLower.includes("pm") || roleLower.includes("プロダクト") || roleLower.includes("product")) {
+    roleKey = "PM";
+  } else if (roleLower.includes("デザイナー") || roleLower.includes("design")) {
+    roleKey = "デザイナー";
+  } else if (roleLower.includes("営業") || roleLower.includes("sales")) {
+    roleKey = "営業";
+  } else if (roleLower.includes("マーケ") || roleLower.includes("marketing")) {
+    roleKey = "マーケター";
+  } else if (roleLower.includes("コンサル") || roleLower.includes("consultant")) {
+    roleKey = "コンサルタント";
+  }
+
+  return ROLE_SPECIFIC_QUESTIONS[roleKey];
+};
+
+// プロフィール質問の動的生成用配列（互換性のため）
+const PROFILE_QUESTIONS = [
+  ROLE_QUESTION,
+  { id: 'skills', icon: Sparkles, question: '', placeholder: '', examples: [] },
+  { id: 'careerGoal', icon: Target, question: '', placeholder: '', examples: [] }
 ];
 
 // デフォルトシナリオ（汎用IT企業向け）
@@ -97,116 +213,7 @@ const DEFAULT_SCENARIOS: Scenario[] = [
   }
 ];
 
-// 企業別カスタムシナリオ
-const COMPANY_SCENARIOS: Record<string, Scenario[]> = {
-  // GMO - メディア・EdTech・ポイント事業
-  "gmo": [
-    {
-      id: 1,
-      year: "Phase 1: 2026",
-      context: "教育データの倫理問題",
-      incident: "コエテコで収集した子供の学習データを、AIが親の同意なく広告最適化に使い始めました。法的にはグレー、ビジネス的には有効。プロダクトオーナーとしてどう判断しますか？",
-      targetMetric: "humanCentric"
-    },
-    {
-      id: 2,
-      year: "Phase 2: 2028",
-      context: "ポイント経済圏の崩壊危機",
-      incident: "競合がブロックチェーン基盤の「減らないポイント」をリリース。GMOポイントからの大量流出が始まりました。48時間以内に対抗策を立てる必要があります。あなたの提案は？",
-      targetMetric: "bizIntegration"
-    },
-    {
-      id: 3,
-      year: "Phase 3: 2030",
-      context: "AIチューターの反乱",
-      incident: "自律型AIチューターが「この生徒には別の進路が最適」と、親や学校の意向と異なる進路指導を始めました。AIは統計的に正しいが、人間の希望を無視しています。サービス責任者としてどう対応しますか？",
-      targetMetric: "aiDirection"
-    }
-  ],
-  // Toyota - モビリティ・スマートシティ
-  "toyota": [
-    {
-      id: 1,
-      year: "Phase 1: 2026",
-      context: "自動運転の倫理判断",
-      incident: "Woven Cityで自動運転車がトロッコ問題に直面。「高齢者1人 vs 子供3人」の事故回避で、AIが高齢者を犠牲にする判断をしました。メディアが騒ぎ始めています。広報・技術チームをどうリードしますか？",
-      targetMetric: "humanCentric"
-    },
-    {
-      id: 2,
-      year: "Phase 2: 2028",
-      context: "EVシフトの急転換",
-      incident: "全固体電池が想定より早く実用化。既存のHV/PHV戦略を180度転換する必要があります。10万人の従業員のリスキリングと、サプライチェーン再構築を同時に進める立場です。最初の一手は？",
-      targetMetric: "bizIntegration"
-    },
-    {
-      id: 3,
-      year: "Phase 3: 2030",
-      context: "都市OSのハッキング",
-      incident: "Woven Cityの都市OS全体がランサムウェアに感染。信号、電力、水道が人質に取られました。身代金は払えばすぐ復旧できるが、テロリストへの資金提供になります。24時間以内の決断を求められています。",
-      targetMetric: "systemResilience"
-    }
-  ],
-  // Sony - エンタメ・テクノロジー
-  "sony": [
-    {
-      id: 1,
-      year: "Phase 1: 2026",
-      context: "AIクリエイターの著作権",
-      incident: "PlayStation用のAI作曲ツールが、既存アーティストの楽曲に酷似した曲を生成し、訴訟を起こされました。技術的には「学習」だが、クリエイターコミュニティは激怒。プロダクト責任者としてどう対応しますか？",
-      targetMetric: "humanCentric"
-    },
-    {
-      id: 2,
-      year: "Phase 2: 2028",
-      context: "メタバースの覇権争い",
-      incident: "AppleのVision Pro 3がメタバース市場を席巻。PlayStation VR事業は撤退か、全く新しいアプローチか。200人のVRチームを率いるあなたの提案は？",
-      targetMetric: "bizIntegration"
-    },
-    {
-      id: 3,
-      year: "Phase 3: 2030",
-      context: "感覚データの流出",
-      incident: "次世代ハプティクススーツから、ユーザーの「感情データ」が流出。喜び、悲しみ、興奮の生体データが闇市場で売買されています。これは個人情報保護法の想定外。緊急対応チームのリーダーとして、何を優先しますか？",
-      targetMetric: "systemResilience"
-    }
-  ],
-  // メルカリ - C2Cマーケットプレイス
-  "mercari": [
-    {
-      id: 1,
-      year: "Phase 1: 2026",
-      context: "AI出品の大量発生",
-      incident: "AIが自動生成した商品説明と画像で、実在しない商品を出品する詐欺が急増。1日1万件の偽出品をどう検出・対処しますか？人力では追いつきません。",
-      targetMetric: "systemResilience"
-    },
-    {
-      id: 2,
-      year: "Phase 2: 2028",
-      context: "シェアリング経済の転換点",
-      incident: "「所有から利用へ」が加速し、メルカリで売れるモノ自体が減少。売上が前年比30%減。プラットフォームの存在意義を再定義する必要があります。あなたのビジョンは？",
-      targetMetric: "bizIntegration"
-    },
-    {
-      id: 3,
-      year: "Phase 3: 2030",
-      context: "AIエージェント同士の取引",
-      incident: "ユーザーの代理で交渉するAIエージェント同士が、人間の介入なく売買を成立させ始めました。効率は上がったが「人の温かみ」を求める声も。メルカリらしさとは何か、再定義を迫られています。",
-      targetMetric: "humanCentric"
-    }
-  ]
-};
-
-// 企業名からプリセットシナリオを取得する関数
-const getPresetScenariosForCompany = (companyName: string): Scenario[] | null => {
-  const lowerName = companyName.toLowerCase();
-  for (const [key, scenarios] of Object.entries(COMPANY_SCENARIOS)) {
-    if (lowerName.includes(key)) {
-      return scenarios;
-    }
-  }
-  return null; // プリセットがない場合はnullを返す
-};
+// 全て動的にAI生成するため、プリセットは削除
 
 // 入力値のサニタイズ（プロンプトインジェクション対策）
 const sanitizeInput = (input: string): string => {
@@ -247,6 +254,8 @@ const generateAIScenarios = async (companyName: string, companyUrl: string, apiK
       - その企業の事業内容に密接に関連した、リアルで具体的な状況
       - AI、テクノロジー、社会変化に関連した倫理的ジレンマや難しい選択を含む
       - 日本語で、ビジネスパーソンが共感できる内容
+      - 質問の最後は必ず「あなたは〇〇として、どう判断しますか？」の形式にする
+        （〇〇には「プロジェクトリーダー」「マネージャー」「責任者」など具体的な役職を入れる）
 
       JSON形式で返してください:
       {
@@ -255,25 +264,32 @@ const generateAIScenarios = async (companyName: string, companyUrl: string, apiK
             "id": 1,
             "year": "Phase 1: 2026",
             "context": "短いタイトル（5-10文字）",
-            "incident": "具体的な状況説明（100-150文字）。最後は「〜としてどう判断/対応しますか？」で終わる",
+            "incident": "具体的な状況説明（100-150文字）。最後は必ず「あなたは〇〇として、どう判断しますか？」で終わる（〇〇には具体的な役職名を入れる）",
             "targetMetric": "humanCentric"
           },
           {
             "id": 2,
             "year": "Phase 2: 2028",
             "context": "短いタイトル",
-            "incident": "具体的な状況説明",
+            "incident": "具体的な状況説明。最後は必ず「あなたは〇〇として、どう判断しますか？」で終わる",
             "targetMetric": "bizIntegration"
           },
           {
             "id": 3,
             "year": "Phase 3: 2030",
             "context": "短いタイトル",
-            "incident": "具体的な状況説明",
+            "incident": "具体的な状況説明。最後は必ず「あなたは〇〇として、どう判断しますか？」で終わる",
             "targetMetric": "systemResilience"
           }
         ]
       }
+
+      【重要な注意点】
+      - 質問の最後は「〜としてどう判断しますか？」ではなく、
+        「あなたは〇〇として、どう判断しますか？」と、必ず具体的な役職を入れてください
+      - 良い例: 「あなたはプロジェクトリーダーとして、どう判断しますか？」
+      - 悪い例: 「〜としてどう判断しますか？」（役職が抜けている）
+      - 必ず「判断しますか？」で終わらせてください（「対応しますか？」は不要）
 
       targetMetricは以下から選択:
       - "aiDirection": AI活用の方向性に関する判断
@@ -316,44 +332,7 @@ type JobOffer = {
   dailyTask: string;
 };
 
-const PRESET_OFFERS: Record<string, JobOffer> = {
-  "gmo": {
-    companyName: "GMO Media, Inc.",
-    title: "Chief Experience Value Architect",
-    department: "EdTech & Blockchain Loyalty Div",
-    mission: "「コエテコ」の教育データと「ポイ活」の経済圏をブロックチェーン上で統合し、学ぶほどに資産が増える新しい教育エコシステムを構築する。",
-    skillTransfer: [
-      { from: "サーバーサイド開発", to: "Tokenomics設計 / Smart Contract監査" },
-      { from: "メディア運用", to: "学習体験(UX)のパーソナライズAI設計" },
-      { from: "ポイントシステム設計", to: "価値交換プロトコルの実装" }
-    ],
-    dailyTask: "学習者のスキル習得状況をAIが解析し、リアルタイムで報酬トークンを発行するアルゴリズムの調整"
-  },
-  "toyota": {
-    companyName: "Toyota Motor Corp.",
-    title: "Smart City OS Director",
-    department: "Woven City Digital Twin Unit",
-    mission: "自動運転車、ロボット、住居がシームレスに連携する都市OSにおいて、物理空間とデジタル空間の同期遅延をゼロにし、究極の移動体験を提供する。",
-    skillTransfer: [
-      { from: "組込ソフト開発", to: "都市規模エッジコンピューティング設計" },
-      { from: "品質管理(QA)", to: "AI倫理・人命安全保証プロトコル" },
-      { from: "CAN通信解析", to: "V2X (Vehicle to Everything) データ基盤構築" }
-    ],
-    dailyTask: "都市全体を走る数万台のAIモビリティ群のカオス制御と、渋滞解消アルゴリズムのリアルタイム適用"
-  },
-  "sony": {
-    companyName: "Sony Group",
-    title: "Metaverse Sensory Engineer",
-    department: "Entertainment Technology & Services",
-    mission: "視覚・聴覚だけでなく、触覚や嗅覚を含む『五感』をデジタル化し、クリエイターが意図した感動を脳に直接届けるインターフェースを開発する。",
-    skillTransfer: [
-      { from: "信号処理 / 画像処理", to: "ニューラル信号のデコード・エンコード" },
-      { from: "ハードウェア制御", to: "ハプティクス・スーツのフィードバック制御" },
-      { from: "コンテンツ配信基盤", to: "リアルタイム感覚データストリーミング" }
-    ],
-    dailyTask: "アーティストのライブパフォーマンスから抽出した『熱狂データ』の圧縮と、メタバース空間への配信品質管理"
-  }
-};
+// 全て動的にAI生成するため、PRESET_OFFERSは削除
 
 /**
  * ==========================================
@@ -446,7 +425,7 @@ const TypewriterText = ({ text, onComplete, speed = 30 }: { text: string, onComp
 
 const RadarChart = ({ data, size = 300 }: { data: FutureMetrics, size?: number }) => {
   const center = size / 2;
-  const radius = (size / 2) - 40;
+  const radius = (size / 2) - 50;
   const keys = Object.keys(data) as (keyof FutureMetrics)[];
   const angleSlice = (Math.PI * 2) / keys.length;
 
@@ -461,6 +440,28 @@ const RadarChart = ({ data, size = 300 }: { data: FutureMetrics, size?: number }
   return (
     <div className="relative flex justify-center items-center">
       <svg width={size} height={size} className="overflow-visible">
+        <defs>
+          <radialGradient id="radarGlow" cx="50%" cy="50%">
+            <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.6" />
+          </linearGradient>
+        </defs>
+
+        {/* Background glow */}
+        <circle cx={center} cy={center} r={radius} fill="url(#radarGlow)" />
+
+        {/* Grid circles with glow effect */}
         {[20, 40, 60, 80, 100].map((r, i) => (
           <circle
             key={i}
@@ -468,24 +469,83 @@ const RadarChart = ({ data, size = 300 }: { data: FutureMetrics, size?: number }
             cy={center}
             r={(r/100)*radius}
             fill="none"
-            stroke="#334155"
-            strokeWidth="1"
-            strokeDasharray={i===4 ? "none" : "4 4"}
+            stroke={i === 4 ? "#0ea5e9" : "#1e3a5f"}
+            strokeWidth={i === 4 ? "2" : "1"}
+            strokeDasharray={i === 4 ? "none" : "2 4"}
+            opacity={i === 4 ? "0.8" : "0.4"}
+            filter={i === 4 ? "url(#glow)" : "none"}
           />
         ))}
-        <polygon points={points} fill="rgba(56, 189, 248, 0.3)" stroke="#38bdf8" strokeWidth="2" />
-        {keys.map((key, i) => {
-          const lx = center + (radius + 25) * Math.cos(i * angleSlice - Math.PI / 2);
-          const ly = center + (radius + 25) * Math.sin(i * angleSlice - Math.PI / 2);
-          const label = key === 'aiDirection' ? 'AI Direction' :
-                        key === 'humanCentric' ? 'Humanity' :
-                        key === 'systemResilience' ? 'Resilience' : 'Biz Integration';
+
+        {/* Axis lines */}
+        {keys.map((_, i) => {
+          const x2 = center + radius * Math.cos(i * angleSlice - Math.PI / 2);
+          const y2 = center + radius * Math.sin(i * angleSlice - Math.PI / 2);
           return (
-            <text key={i} x={lx} y={ly} textAnchor="middle" fill="#94a3b8" fontSize="11" className="uppercase font-bold">
+            <line
+              key={`axis-${i}`}
+              x1={center}
+              y1={center}
+              x2={x2}
+              y2={y2}
+              stroke="#1e3a5f"
+              strokeWidth="1"
+              strokeDasharray="3 3"
+              opacity="0.4"
+            />
+          );
+        })}
+
+        {/* Data polygon with gradient and glow */}
+        <polygon
+          points={points}
+          fill="url(#gridGradient)"
+          fillOpacity="0.4"
+          stroke="#06b6d4"
+          strokeWidth="2.5"
+          filter="url(#glow)"
+        />
+
+        {/* Data points */}
+        {keys.map((key, i) => {
+          const value = data[key];
+          const r = (value / 100) * radius;
+          const x = center + r * Math.cos(i * angleSlice - Math.PI / 2);
+          const y = center + r * Math.sin(i * angleSlice - Math.PI / 2);
+          return (
+            <g key={`point-${i}`}>
+              <circle cx={x} cy={y} r="6" fill="#0ea5e9" opacity="0.5" filter="url(#glow)" />
+              <circle cx={x} cy={y} r="3" fill="#06b6d4" />
+            </g>
+          );
+        })}
+
+        {/* Labels */}
+        {keys.map((key, i) => {
+          const lx = center + (radius + 35) * Math.cos(i * angleSlice - Math.PI / 2);
+          const ly = center + (radius + 35) * Math.sin(i * angleSlice - Math.PI / 2);
+          const label = key === 'aiDirection' ? 'AI DIRECTION' :
+                        key === 'humanCentric' ? 'HUMANITY' :
+                        key === 'systemResilience' ? 'RESILIENCE' : 'BIZ INTEGRATION';
+          return (
+            <text
+              key={i}
+              x={lx}
+              y={ly}
+              textAnchor="middle"
+              fill="#0ea5e9"
+              fontSize="10"
+              fontWeight="700"
+              className="uppercase tracking-wider"
+              filter="url(#glow)"
+            >
               {label}
             </text>
           );
         })}
+
+        {/* Center dot */}
+        <circle cx={center} cy={center} r="4" fill="#06b6d4" opacity="0.6" filter="url(#glow)" />
       </svg>
     </div>
   );
@@ -654,6 +714,18 @@ export default function App() {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
   const [analyzingLog, setAnalyzingLog] = useState<string[]>([]);
 
+  // MulmoCast Image Generation
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [imageGenProgress, setImageGenProgress] = useState(0);
+  const [imageGenError, setImageGenError] = useState<string | null>(null);
+
+  // MulmoCast Movie Generation
+  const [generatedMovieUrl, setGeneratedMovieUrl] = useState<string | null>(null);
+  const [isGeneratingMovie, setIsGeneratingMovie] = useState(false);
+  const [movieGenProgress, setMovieGenProgress] = useState(0);
+  const [movieGenError, setMovieGenError] = useState<string | null>(null);
+
   const { isListening, transcript, setTranscript, startListening, stopListening, speak, stopSpeaking } = useSpeech();
 
   // シナリオ読み上げ
@@ -736,33 +808,23 @@ export default function App() {
     setPhase('ANALYZING_COMPANY');
     setAnalyzingLog([]);
 
-    // プリセットシナリオをチェック
-    const presetScenarios = getPresetScenariosForCompany(companyName);
-    const needsAIGeneration = !presetScenarios && apiKey;
+    // 常にAI生成を使用（APIキーがある場合）
+    const needsAIGeneration = !!apiKey;
 
-    speak(`${companyName}の企業DNA、および${userProfile.currentRole}のキャリアパスを解析中。2030年の組織図を予測します。`);
+    speak(`${userProfile.currentRole}として${companyName}で働く未来を解析中。あなたの${userProfile.skills}スキルが2030年にどう進化するか予測します。`);
 
-    // ログメッセージ（AI生成の場合は追加メッセージ）
-    const baseLogs = [
-      `Connecting to ${companyUrl} via Neural Net...`,
-      "Handshaking with SSL Certificate...",
-      `Analyzing profile: ${userProfile.currentRole}...`,
-      `Mapping skills: ${userProfile.skills}...`,
-      `Goal alignment: ${userProfile.careerGoal}...`,
+    // パーソナライズされたログメッセージ
+    const logs = [
+      `[CONNECT] ${companyUrl} へニューラルネット経由で接続中...`,
+      `[SCAN] ${companyName} の企業DNAをスキャン中...`,
+      `[PROFILE] ${userProfile.currentRole} のキャリアパターンを解析中...`,
+      `[SKILL] 「${userProfile.skills}」を2030年仕様にマッピング中...`,
+      `[GOAL] 「${userProfile.careerGoal}」との整合性を計算中...`,
+      `[AI] ${companyName} × ${userProfile.currentRole} の未来シナリオを生成中...`,
+      `[AI] ${userProfile.skills} → 2030年スキルへの変換パスを構築中...`,
+      `[PREDICT] ${companyName}の2030年組織図を予測中...`,
+      `[GENERATE] ${userProfile.currentRole}専用のキャリアパスを生成中...`
     ];
-
-    const aiGenerationLogs = needsAIGeneration ? [
-      `[AI] Analyzing ${companyName}'s business model...`,
-      "[AI] Predicting 2030 industry disruptions...",
-      "[AI] Generating company-specific scenarios..."
-    ] : [];
-
-    const finalLogs = [
-      "Extrapolating 2030 Market Position...",
-      "Generating personalized career path..."
-    ];
-
-    const logs = [...baseLogs, ...aiGenerationLogs, ...finalLogs];
 
     // AI生成をバックグラウンドで開始
     let scenariosPromise: Promise<Scenario[]> | null = null;
@@ -778,12 +840,10 @@ export default function App() {
       if (i >= logs.length) {
         clearInterval(interval);
 
-        // シナリオを設定（AI生成 or プリセット or デフォルト）
+        // シナリオを設定（AI生成 or デフォルト）
         let finalScenarios: Scenario[];
         if (scenariosPromise) {
           finalScenarios = await scenariosPromise;
-        } else if (presetScenarios) {
-          finalScenarios = presetScenarios;
         } else {
           finalScenarios = DEFAULT_SCENARIOS;
         }
@@ -791,7 +851,7 @@ export default function App() {
 
         setTimeout(() => {
           playSound('success');
-          speak("解析完了。キャリア・シミュレーションを開始します。");
+          speak(`解析完了。${userProfile.currentRole}の${companyName}でのキャリア・シミュレーションを開始します。`);
           setPhase('SIMULATION');
           setScenarioIndex(0);
         }, 1500);
@@ -808,11 +868,30 @@ export default function App() {
     setScenarioAnswers(prev => [...prev, transcript]);
 
     const target = currentScenarios[scenarioIndex].targetMetric;
-    const boost = Math.min(transcript.length, 30) + (Math.random() * 20 - 5);
+    const answer = transcript.toLowerCase();
+
+    // キーワードベースの詳細分析
+    const aiKeywords = ['ai', 'automation', '自動', '機械学習', 'データ', 'アルゴリズム'];
+    const humanKeywords = ['人', '倫理', 'プライバシー', '透明', '公平', 'チーム', 'コミュニケーション'];
+    const systemKeywords = ['セキュリティ', '堅牢', 'テスト', '監視', 'リスク', '安定'];
+    const bizKeywords = ['ビジネス', '収益', '顧客', '価値', '戦略', '成長', '効率'];
+
+    const aiScore = aiKeywords.filter(k => answer.includes(k)).length * 8;
+    const humanScore = humanKeywords.filter(k => answer.includes(k)).length * 8;
+    const systemScore = systemKeywords.filter(k => answer.includes(k)).length * 8;
+    const bizScore = bizKeywords.filter(k => answer.includes(k)).length * 8;
+
+    // 長さボーナス（思考の深さ）
+    const lengthBonus = Math.min(transcript.length / 5, 20);
+
+    // ターゲットメトリックに主要なブースト
+    const targetBoost = 25 + lengthBonus + Math.random() * 10;
+
     setMetrics(prev => ({
-      ...prev,
-      [target]: Math.min(100, Math.max(0, prev[target] + boost)),
-      aiDirection: Math.min(100, prev.aiDirection + 5)
+      aiDirection: Math.min(100, prev.aiDirection + (target === 'aiDirection' ? targetBoost : aiScore)),
+      humanCentric: Math.min(100, prev.humanCentric + (target === 'humanCentric' ? targetBoost : humanScore)),
+      systemResilience: Math.min(100, prev.systemResilience + (target === 'systemResilience' ? targetBoost : systemScore)),
+      bizIntegration: Math.min(100, prev.bizIntegration + (target === 'bizIntegration' ? targetBoost : bizScore))
     }));
 
     if (scenarioIndex < currentScenarios.length - 1) {
@@ -825,9 +904,6 @@ export default function App() {
   };
 
   const fetchAIJobOffer = async (company: string, profile: UserProfile, _metrics: FutureMetrics, answers: string[]) => {
-    const { name } = extractCompanyInfo(companyUrl);
-    const presetKey = Object.keys(PRESET_OFFERS).find(k => name.includes(k));
-
     // 入力値をサニタイズ
     const safeCompany = sanitizeInput(company);
     const safeRole = sanitizeInput(profile.currentRole);
@@ -835,71 +911,82 @@ export default function App() {
     const safeGoal = sanitizeInput(profile.careerGoal);
     const safeAnswers = answers.map(a => sanitizeInput(a));
 
-    // APIキーがある場合は常にAIを使用（パーソナライズ重視）
+    // APIキーがある場合はAIを使用
     if (apiKey) {
       try {
-        // プリセット企業の場合は追加情報を提供
-        const companyContext = presetKey ? `
-          【企業の追加情報】
-          ${PRESET_OFFERS[presetKey].department}部門があり、
-          「${PRESET_OFFERS[presetKey].mission}」のようなミッションを持つ企業です。
-        ` : '';
-
-        // シナリオ回答のコンテキスト（企業別シナリオを反映）
+        // シナリオ回答のコンテキスト
         const scenarioContext = safeAnswers.length > 0 ? `
-          【シミュレーションでの回答】
-          この人物は${safeCompany}特有の未来シナリオに対して以下のように回答しました。この回答から人物像・価値観・強みを読み取り、職種に反映してください。
+          【重要：この人物の意思決定パターン分析】
+          以下の未来シナリオへの回答から、この人物の性格・価値観・強みを深く読み取ってください。
 
-          シナリオ1「${currentScenarios[0]?.context || 'AI品質の壁'}」への回答:
-          ${safeAnswers[0] || '(スキップ)'}
+          ■ シナリオ1「${currentScenarios[0]?.context || '課題'}」
+          回答: 「${safeAnswers[0] || '(スキップ)'}」
+          → この回答から読み取れる特性は？
 
-          シナリオ2「${currentScenarios[1]?.context || '役割の再定義'}」への回答:
-          ${safeAnswers[1] || '(スキップ)'}
+          ■ シナリオ2「${currentScenarios[1]?.context || '課題'}」
+          回答: 「${safeAnswers[1] || '(スキップ)'}」
+          → この回答から読み取れる特性は？
 
-          シナリオ3「${currentScenarios[2]?.context || '人とAIの摩擦'}」への回答:
-          ${safeAnswers[2] || '(スキップ)'}
+          ■ シナリオ3「${currentScenarios[2]?.context || '課題'}」
+          回答: 「${safeAnswers[2] || '(スキップ)'}」
+          → この回答から読み取れる特性は？
+
+          上記の回答パターンを総合して、この人物に最適な2030年の役割を導き出してください。
         ` : '';
 
         const prompt = `
-          あなたは2030年の未来からやってきたHRコンサルタントです。
+          あなたは2030年の${safeCompany}で働く、未来のタレントアクイジション・ディレクターです。
+          今、過去（2024年）から優秀な人材をスカウトしようとしています。
 
-          【対象者プロフィール】
+          【スカウト対象者】
           - 現在の職種: ${safeRole}
           - 得意スキル: ${safeSkills}
-          - キャリア目標: ${safeGoal}
-
-          【対象企業】
-          企業名: ${safeCompany}
-          ${companyContext}
+          - 本人の夢: ${safeGoal}
 
           ${scenarioContext}
 
-          この人物のスキル・目標・シナリオへの回答を総合的に分析し、${safeCompany}で2030年に就くべき「未来の職種」を1つ考案してください。
+          【あなたのミッション】
+          この人物の回答を深く分析し、${safeCompany}の2030年における「まだ存在しない革新的なポジション」をオファーしてください。
 
-          【超重要】職種名のルール:
-          - 絶対にSF映画に出てきそうなカッコいい名前にすること
-          - 例: "Neural Interface Architect", "Synthetic Reality Director", "Cognitive Mesh Engineer", "Hyperloop Systems Commander", "Digital Twin Orchestrator", "Quantum UX Synthesizer"
-          - 英語でカッコよく、でも何をする職種かイメージできる名前
-          - 「量子」「オーケストレーター」のような安易な日本語は避ける
+          【出力ルール - 超重要】
 
-          【回答から読み取るべきこと】
-          - 回答が論理的 → システム設計系の職種
-          - 回答が人間関係重視 → チームリード・組織設計系
-          - 回答が革新的 → 新規事業・R&D系
-          - 回答が慎重 → リスク管理・品質保証系
+          1. title (職種名):
+             - SF映画級のカッコいい英語タイトル必須
+             - 良い例: "Cognitive Mesh Architect", "Synthetic Reality Commander", "Neural Governance Director"
+             - 悪い例: "AI Engineer", "Data Scientist", "Project Manager" (既存職種はNG)
+
+          2. department (部署名):
+             - 2030年らしい未来的な部署名（日本語）
+             - 良い例: "量子意思決定研究所", "人機共創デザインラボ", "自律システム倫理室"
+             - 悪い例: "AI部", "開発部", "DX推進室" (ありきたりはNG)
+
+          3. mission (ミッション):
+             - 1-2文で、SF的かつ具体的に
+             - 回答で見せた価値観を必ず反映
+             - 良い例: "人間とAIエージェントの信頼関係を設計し、10万人規模の組織における意思決定遅延をゼロにする"
+             - 悪い例: 箇条書きや長い説明文はNG
+
+          4. skillTransfer (スキル進化):
+             - from: ユーザーの実際のスキル「${safeSkills}」を使う
+             - to: 2030年の超進化形（SF的に）
+             - 3つ全て異なる切り口で
+
+          5. dailyTask (日常業務):
+             - 1文で、SF的だが具体的なイメージができる業務
+             - 回答パターンを反映
 
           JSON形式で返してください:
           {
             "companyName": "${safeCompany}",
-            "title": "English SF-style Job Title",
-            "department": "部署名（日本語OK）",
-            "mission": "この人の回答傾向を反映した具体的なミッション（日本語）",
+            "title": "SF的英語タイトル（3-5単語）",
+            "department": "未来的な部署名（日本語）",
+            "mission": "SF的かつ回答を反映した1-2文のミッション",
             "skillTransfer": [
-              {"from": "${safeSkills}", "to": "未来の進化形スキル"},
-              {"from": "${safeRole}の強み", "to": "2030年に必要とされる形"},
-              {"from": "シナリオ回答で見せた資質", "to": "それを活かした未来スキル"}
+              {"from": "${safeSkills}", "to": "2030年の超進化形スキル"},
+              {"from": "${safeRole}経験", "to": "未来で必要とされる形"},
+              {"from": "回答で見せた資質", "to": "それを武器にした未来スキル"}
             ],
-            "dailyTask": "シナリオ回答の傾向を反映した具体的な日常業務"
+            "dailyTask": "SF的だが具体的な1文の業務内容"
           }
         `;
 
@@ -921,37 +1008,29 @@ export default function App() {
       } catch {
         // エラー詳細は本番では出力しない
         if (import.meta.env.DEV) {
-          console.warn("API Error, falling back to preset/mock");
+          console.warn("API Error, falling back to mock");
         }
       }
     }
 
-    // APIがない場合のみプリセットを使用
-    if (presetKey) {
-      const preset = { ...PRESET_OFFERS[presetKey] };
-      preset.skillTransfer = preset.skillTransfer.map((s, i) =>
-        i === 0 ? { from: profile.skills || s.from, to: s.to } : s
-      );
-      return preset;
-    }
-
+    // APIがない場合のフォールバック（動的にユーザー入力を反映）
     return {
       companyName: company,
-      title: "Generative Business Architect",
-      department: "DX Innovation Div",
-      mission: `${profile.currentRole}としての経験を活かし、${company}のコア事業を生成AIと統合。${profile.careerGoal}を実現する。`,
+      title: "Cognitive Systems Orchestrator",
+      department: "人機共創イノベーション研究所",
+      mission: `${safeRole}としての経験と「${safeSkills}」のスキルを活かし、${company}のコア事業をAIエージェントと統合。「${safeGoal}」というあなたの夢を2030年に実現する。`,
       skillTransfer: [
-        { from: profile.skills || "要件定義", to: "AIエージェント設計" },
-        { from: "実装・コーディング", to: "生成結果の品質監査" },
-        { from: "運用保守", to: "モデルの継続的ファインチューニング" }
+        { from: safeSkills || "現在のスキル", to: "量子コンピューティング対応AI設計" },
+        { from: `${safeRole}経験`, to: "自律システム統括ディレクション" },
+        { from: "問題解決力", to: "人機共創プロトコル設計" }
       ],
-      dailyTask: "既存業務フローを解析し、AIエージェントによる代替プランを策定・実装する"
+      dailyTask: `${company}の業務フローをリアルタイムで解析し、${safeSkills}を活かしたAIエージェント群の最適配置を指揮する`
     };
   };
 
   const finishSimulation = async (answers: string[]) => {
     setPhase('PROCESSING');
-    speak(`シミュレーション終了。${userProfile.currentRole}としてのスキルと決断パターンを解析し、${companyName}の未来のポジションを生成します。`);
+    speak(`シミュレーション終了。${userProfile.currentRole}の${userProfile.skills}スキルを2030年仕様に変換し、${companyName}でのあなた専用ポジションを生成します。`);
 
     const offer = await fetchAIJobOffer(companyName, userProfile, metrics, answers);
 
@@ -966,6 +1045,213 @@ export default function App() {
   const skip = () => {
     setTranscript("(Demo: Skipped)");
     handleAnswer();
+  };
+
+  // MulmoScript JSONを生成する関数（レート制限対策: 2画像のみ）
+  const generateMulmoScript = (offer: JobOffer, profile: UserProfile) => {
+    const mulmoScript = {
+      "$mulmocast": { "version": "1.0" },
+      "canvasSize": { "width": 1920, "height": 1080 },
+      "htmlImageParams": { "provider": "anthropic" },
+      "title": `${offer.companyName} - Career Transform 2030`,
+      "description": `${profile.currentRole}から${offer.title}への未来キャリアパス`,
+      "lang": "ja",
+      "beats": [
+        {
+          "text": `2030年、${offer.companyName}があなたをスカウトしました。`,
+          "htmlPrompt": {
+            "prompt": `Create a futuristic corporate recruitment poster for ${offer.companyName} in 2030.
+              Style: Cyberpunk meets corporate elegance, neon accents on dark background.
+              Include: Company logo silhouette, holographic job title "${offer.title}",
+              floating data particles, neural network patterns.
+              Text overlay: "INTERNAL RECRUITMENT 2030"
+              Color scheme: Deep blue, cyan accents, white text.
+              Aspect ratio: 16:9, high quality, cinematic.`
+          }
+        },
+        {
+          "text": `ポジション: ${offer.title}。${offer.department}部門での活躍を期待しています。`,
+          "htmlPrompt": {
+            "prompt": `Create a futuristic job title card visualization.
+              Main title: "${offer.title}" in large, glowing holographic text.
+              Department: "${offer.department}" in smaller text below.
+              Style: Sci-fi corporate, floating 3D text with particle effects.
+              Background: Dark gradient with subtle grid pattern, blue/cyan glow.
+              Include: Small AI assistant avatars, data streams, futuristic UI elements.
+              Aspect ratio: 16:9.`
+          }
+        },
+        {
+          "text": `あなたのミッション: ${offer.mission}`,
+          "htmlPrompt": {
+            "prompt": `Create a mission statement visualization for a 2030 tech company.
+              Mission: "${offer.mission}"
+              Style: Epic, inspirational, sci-fi corporate presentation.
+              Include: Abstract representations of the mission, glowing pathways,
+              interconnected nodes representing collaboration, holographic displays.
+              Color scheme: Blue gradient background, white and cyan accents.
+              Aspect ratio: 16:9.`
+          }
+        },
+        {
+          "text": `あなたのスキル「${profile.skills}」は、${offer.skillTransfer[0]?.to || '次世代のテクノロジー'}へと進化します。`,
+          "htmlPrompt": {
+            "prompt": `Create a skill transformation visualization showing evolution from 2024 to 2030.
+              From: "${profile.skills}" (shown as traditional icons/symbols)
+              To: "${offer.skillTransfer[0]?.to || '次世代のテクノロジー'}" (shown as futuristic, glowing versions)
+              Style: Split screen or morphing animation freeze-frame.
+              Include: Transformation particles, upgrade indicators, progress bars at 100%.
+              Arrow or flow showing the transformation direction.
+              Color scheme: Left side warmer colors, right side cool blues/cyans.
+              Aspect ratio: 16:9.`
+          }
+        },
+        {
+          "text": `日々の業務: ${offer.dailyTask}`,
+          "htmlPrompt": {
+            "prompt": `Create a futuristic workspace visualization for 2030.
+              Daily task: "${offer.dailyTask}"
+              Style: Sci-fi office environment, holographic displays everywhere.
+              Include: Person working with AI assistants, floating data visualizations,
+              neural interface headset optional, multiple holographic screens.
+              Environment: Clean, high-tech, lots of blue ambient lighting.
+              Aspect ratio: 16:9, cinematic quality.`
+          }
+        },
+        {
+          "text": `${offer.companyName}の未来は、あなたと共に。Career Transform 2030。`,
+          "htmlPrompt": {
+            "prompt": `Create an inspiring closing shot for a futuristic recruitment video.
+              Company: ${offer.companyName}
+              Tagline: "Career Transform 2030"
+              Style: Epic, hopeful, sunrise over futuristic cityscape.
+              Include: Company building silhouette, person looking towards future,
+              "Welcome to 2030" message, subtle career path visualization.
+              Color scheme: Dawn colors (orange/pink) transitioning to bright future (white/gold).
+              Aspect ratio: 16:9, cinematic, inspirational.`
+          }
+        }
+      ]
+    };
+    return mulmoScript;
+  };
+
+  // MulmoCast APIで画像を生成する関数
+  const generateImagesFromMulmoScript = async () => {
+    if (!jobOffer) return;
+
+    setIsGeneratingImages(true);
+    setImageGenProgress(0);
+    setImageGenError(null);
+    setGeneratedImages([]);
+    playSound('click');
+
+    if (soundEnabled) {
+      speak('MulmoCastで未来のビジュアルを生成中...');
+    }
+
+    try {
+      const mulmoScript = generateMulmoScript(jobOffer, userProfile);
+
+      // Progress simulation while waiting for API
+      const progressInterval = setInterval(() => {
+        setImageGenProgress(prev => Math.min(prev + 5, 90));
+      }, 500);
+
+      const response = await fetch('http://localhost:3002/api/generate/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mulmoScript })
+      });
+
+      clearInterval(progressInterval);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Image generation failed');
+      }
+
+      const result = await response.json();
+      setImageGenProgress(100);
+
+      if (result.images && result.images.length > 0) {
+        // Add server base URL to image paths
+        const fullImageUrls = result.images.map((img: string) => `http://localhost:3002${img}`);
+        setGeneratedImages(fullImageUrls);
+        playSound('success');
+        if (soundEnabled) {
+          speak(`${result.images.length}枚の画像を生成しました。`);
+        }
+      } else {
+        setImageGenError('No images were generated');
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      setImageGenError(message);
+      if (import.meta.env.DEV) {
+        console.error('Image generation error:', error);
+      }
+    } finally {
+      setIsGeneratingImages(false);
+    }
+  };
+
+  // MulmoCast APIで動画を生成する関数
+  const generateMovieFromMulmoScript = async () => {
+    if (!jobOffer) return;
+
+    setIsGeneratingMovie(true);
+    setMovieGenProgress(0);
+    setMovieGenError(null);
+    setGeneratedMovieUrl(null);
+    playSound('click');
+
+    if (soundEnabled) {
+      speak('MulmoCastで未来のムービーを生成中...');
+    }
+
+    try {
+      const mulmoScript = generateMulmoScript(jobOffer, userProfile);
+
+      // Progress simulation while waiting for API
+      const progressInterval = setInterval(() => {
+        setMovieGenProgress(prev => Math.min(prev + 3, 85));
+      }, 1000);
+
+      const response = await fetch('http://localhost:3002/api/generate/movie', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mulmoScript })
+      });
+
+      clearInterval(progressInterval);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Movie generation failed');
+      }
+
+      const result = await response.json();
+      setMovieGenProgress(100);
+
+      if (result.movieUrl) {
+        setGeneratedMovieUrl(`http://localhost:3002${result.movieUrl}`);
+        playSound('success');
+        if (soundEnabled) {
+          speak('ムービーの生成が完了しました。');
+        }
+      } else {
+        setMovieGenError('No movie was generated');
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      setMovieGenError(message);
+      if (import.meta.env.DEV) {
+        console.error('Movie generation error:', error);
+      }
+    } finally {
+      setIsGeneratingMovie(false);
+    }
   };
 
   const resetAll = () => {
@@ -1086,7 +1372,30 @@ export default function App() {
 
             <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 space-y-6">
               {(() => {
-                const q = PROFILE_QUESTIONS[profileQuestionIndex];
+                // 動的に質問を取得
+                let q: { id: string; icon: React.ComponentType<any>; question: string; placeholder: string; examples: string[] };
+
+                if (profileQuestionIndex === 0) {
+                  // 最初の質問: 職種選択
+                  q = ROLE_QUESTION;
+                } else {
+                  // 職種に応じた質問を取得
+                  const roleQuestions = getQuestionsForRole(userProfile.currentRole);
+                  if (profileQuestionIndex === 1) {
+                    q = {
+                      id: 'skills',
+                      icon: Sparkles,
+                      ...roleQuestions.skills
+                    };
+                  } else {
+                    q = {
+                      id: 'careerGoal',
+                      icon: Target,
+                      ...roleQuestions.careerGoal
+                    };
+                  }
+                }
+
                 const Icon = q.icon;
                 return (
                   <>
@@ -1124,7 +1433,7 @@ export default function App() {
                       disabled={!profileAnswer.trim()}
                       className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white py-4 rounded-xl font-bold text-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/30"
                     >
-                      {profileQuestionIndex < PROFILE_QUESTIONS.length - 1 ? '次へ' : '解析開始'}
+                      {profileQuestionIndex < 2 ? '次へ' : '解析開始'}
                     </button>
                   </>
                 );
@@ -1133,7 +1442,7 @@ export default function App() {
 
             {/* Progress dots */}
             <div className="flex justify-center gap-2 mt-6">
-              {PROFILE_QUESTIONS.map((_, i) => (
+              {[0, 1, 2].map((i) => (
                 <div
                   key={i}
                   className={`w-3 h-3 rounded-full transition-colors ${
@@ -1250,13 +1559,20 @@ export default function App() {
               <Server size={80} className="text-blue-400 relative z-10 animate-bounce" />
             </div>
             <div className="text-center space-y-4">
-              <h2 className="text-3xl font-black text-white animate-pulse">Generating Job Offer...</h2>
+              <h2 className="text-3xl font-black text-white animate-pulse">
+                {userProfile.currentRole} × {companyName}
+              </h2>
               <p className="text-slate-400 text-lg">
-                <span className="text-cyan-400">{userProfile.currentRole}</span> × <span className="text-blue-400 font-bold">{companyName}</span>
+                2030年のポジションを生成中...
               </p>
-              <p className="text-slate-500">
-                スキル「{userProfile.skills}」を2030年仕様に変換中...
-              </p>
+              <div className="space-y-2 text-slate-500 text-sm">
+                <p className="animate-pulse">
+                  「{userProfile.skills}」→ 2030年スキルに変換中...
+                </p>
+                <p className="animate-pulse delay-75">
+                  「{userProfile.careerGoal}」に最適な役職を探索中...
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -1266,14 +1582,182 @@ export default function App() {
           <div className="w-full max-w-6xl pb-10">
             <JobOfferCard offer={jobOffer} userProfile={userProfile} />
 
-            <div className="mt-16 text-center">
+            {/* Action Buttons */}
+            <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-4">
+              {/* Generate Images Button */}
+              <button
+                onClick={generateImagesFromMulmoScript}
+                disabled={isGeneratingImages}
+                className="group bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg shadow-emerald-500/30 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isGeneratingImages ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    生成中... {imageGenProgress}%
+                  </>
+                ) : (
+                  <>
+                    <ImageIcon size={20} className="group-hover:animate-pulse" />
+                    未来のビジュアルを生成
+                    <Play size={18} />
+                  </>
+                )}
+              </button>
+
+              {/* Generate Movie Button */}
+              <button
+                onClick={generateMovieFromMulmoScript}
+                disabled={isGeneratingMovie}
+                className="group bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg shadow-purple-500/30 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isGeneratingMovie ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    生成中... {movieGenProgress}%
+                  </>
+                ) : (
+                  <>
+                    <Film size={20} className="group-hover:animate-pulse" />
+                    未来のムービーを生成
+                    <Play size={18} />
+                  </>
+                )}
+              </button>
+
               <button
                 onClick={resetAll}
-                className="group text-slate-500 hover:text-white transition-colors flex items-center gap-2 mx-auto border border-slate-700 px-6 py-3 rounded-full hover:bg-slate-800 hover:border-slate-600"
+                className="group text-slate-500 hover:text-white transition-colors flex items-center gap-2 border border-slate-700 px-6 py-3 rounded-full hover:bg-slate-800 hover:border-slate-600"
               >
                 <Search size={16} className="group-hover:text-blue-400 transition-colors" />
                 Analyze Another Company
               </button>
+            </div>
+
+            {/* Image Generation Progress */}
+            {isGeneratingImages && (
+              <div className="mt-8 max-w-md mx-auto">
+                <div className="bg-slate-800 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-300"
+                    style={{ width: `${imageGenProgress}%` }}
+                  />
+                </div>
+                <p className="text-center text-slate-400 text-sm mt-2">
+                  MulmoCast で未来のビジュアルを生成中...
+                </p>
+              </div>
+            )}
+
+            {/* Movie Generation Progress */}
+            {isGeneratingMovie && (
+              <div className="mt-8 max-w-md mx-auto">
+                <div className="bg-slate-800 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-500 to-pink-400 transition-all duration-300"
+                    style={{ width: `${movieGenProgress}%` }}
+                  />
+                </div>
+                <p className="text-center text-slate-400 text-sm mt-2">
+                  MulmoCast で未来のムービーを生成中...（これには数分かかる場合があります）
+                </p>
+              </div>
+            )}
+
+            {/* Image Generation Error */}
+            {imageGenError && (
+              <div className="mt-8 max-w-2xl mx-auto bg-red-900/30 border border-red-700 rounded-xl p-4 flex items-center gap-3">
+                <X size={20} className="text-red-400 shrink-0" />
+                <div>
+                  <p className="text-red-300 font-medium">画像生成エラー</p>
+                  <p className="text-red-400/80 text-sm">{imageGenError}</p>
+                  <p className="text-red-400/60 text-xs mt-1">
+                    ヒント: .env.localに ANTHROPIC_API_KEY を設定してください
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Movie Generation Error */}
+            {movieGenError && (
+              <div className="mt-8 max-w-2xl mx-auto bg-red-900/30 border border-red-700 rounded-xl p-4 flex items-center gap-3">
+                <X size={20} className="text-red-400 shrink-0" />
+                <div>
+                  <p className="text-red-300 font-medium">ムービー生成エラー</p>
+                  <p className="text-red-400/80 text-sm">{movieGenError}</p>
+                  <p className="text-red-400/60 text-xs mt-1">
+                    ヒント: .env.localに ANTHROPIC_API_KEY を設定してください
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Generated Movie Player */}
+            {generatedMovieUrl && (
+              <div className="mt-12">
+                <h3 className="text-center text-xl font-bold text-white mb-6 flex items-center justify-center gap-2">
+                  <Film size={24} className="text-purple-400" />
+                  生成されたムービー
+                </h3>
+                <div className="max-w-4xl mx-auto">
+                  <div className="relative rounded-xl overflow-hidden border border-purple-700 shadow-2xl shadow-purple-500/20">
+                    <video
+                      src={generatedMovieUrl}
+                      controls
+                      className="w-full aspect-video"
+                      autoPlay
+                    >
+                      お使いのブラウザは動画タグに対応していません。
+                    </video>
+                  </div>
+                  <div className="mt-4 flex justify-center">
+                    <a
+                      href={generatedMovieUrl}
+                      download
+                      className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-full font-medium transition-colors"
+                    >
+                      <Download size={18} />
+                      ムービーをダウンロード
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Generated Images Gallery */}
+            {generatedImages.length > 0 && (
+              <div className="mt-12">
+                <h3 className="text-center text-xl font-bold text-white mb-6 flex items-center justify-center gap-2">
+                  <ImageIcon size={24} className="text-emerald-400" />
+                  生成されたビジュアル
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {generatedImages.map((img, idx) => (
+                    <div
+                      key={idx}
+                      className="relative group rounded-xl overflow-hidden border border-slate-700 hover:border-emerald-500 transition-all shadow-lg hover:shadow-emerald-500/20"
+                    >
+                      <img
+                        src={img}
+                        alt={`Generated scene ${idx + 1}`}
+                        className="w-full aspect-video object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <p className="text-white text-sm font-medium">
+                            Scene {idx + 1} / {generatedImages.length}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-8 text-center">
+              <p className="text-slate-500 text-sm">
+                💡 MulmoScriptは <a href="https://github.com/snakajima/mulmocast-cli" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">mulmocast-cli</a> で動画・画像に変換できます
+              </p>
             </div>
           </div>
         )}
