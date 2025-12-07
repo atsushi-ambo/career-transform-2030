@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Transform 2030 - ハッカソン発表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .slide {
+            display: none;
+            min-height: 100vh;
+        }
+        .slide.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+
+    <!-- Slide 1: Title -->
+    <div class="slide active items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-blue-900">
+        <div class="text-center animate-in">
+            <h1 class="text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+                Career Transform 2030
+            </h1>
+            <p class="text-3xl text-blue-200 mb-8">AIでデザインする、未来の働き方</p>
+            <div class="mt-12 text-blue-300 text-xl">ハッカソン発表</div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Target User & Problem -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-gray-900 to-blue-900 p-16">
+        <div class="max-w-6xl w-full animate-in">
+            <h2 class="text-5xl font-bold mb-12 text-center text-blue-400">🎯 誰のため？どんな課題？</h2>
+
+            <div class="mb-12 bg-gradient-to-r from-orange-900/30 to-red-900/30 p-8 rounded-lg border-2 border-orange-500">
+                <h3 class="text-3xl font-bold mb-6 text-orange-300">ターゲットユーザー</h3>
+                <div class="grid grid-cols-2 gap-6 text-xl text-gray-200">
+                    <div class="flex items-start">
+                        <span class="text-3xl mr-3">👤</span>
+                        <div>
+                            <p class="font-bold text-orange-200">キャリアチェンジを検討中のエンジニア</p>
+                            <p class="text-gray-400 text-base mt-1">AI時代、自分のスキルは通用する？</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-3xl mr-3">😰</span>
+                        <div>
+                            <p class="font-bold text-orange-200">キャリアに不安を感じている人</p>
+                            <p class="text-gray-400 text-base mt-1">今の会社で、この先どうすれば？</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8">
+                <div class="bg-gray-800/50 p-8 rounded-lg border-2 border-gray-600">
+                    <h3 class="text-3xl font-bold mb-4 text-gray-400">従来の課題</h3>
+                    <p class="text-6xl mb-6">😕</p>
+                    <ul class="text-xl text-gray-300 space-y-3">
+                        <li>• 求人票だけでは実際の仕事がわからない</li>
+                        <li>• AI時代の自分の役割が見えない</li>
+                        <li>• 入社後にミスマッチに気づく</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-br from-blue-600/30 to-purple-600/30 p-8 rounded-lg border-2 border-blue-500">
+                    <h3 class="text-3xl font-bold mb-4 text-blue-300">私たちの解決策</h3>
+                    <p class="text-6xl mb-6">✨</p>
+                    <ul class="text-xl text-blue-200 space-y-3">
+                        <li>• 2030年、その会社での自分を「体験」</li>
+                        <li>• AIと働く具体的なイメージを獲得</li>
+                        <li>• どんなポジションがあるか可視化</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Tech Stack -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-blue-900 to-purple-900 p-16">
+        <div class="max-w-6xl w-full animate-in">
+            <h2 class="text-5xl font-bold mb-12 text-center text-purple-400">🤖 技術スタック</h2>
+            <div class="space-y-6">
+                <div class="bg-blue-800/30 p-6 rounded-lg border-l-4 border-blue-500">
+                    <h3 class="text-2xl font-bold mb-3 text-blue-300">Frontend</h3>
+                    <p class="text-xl text-gray-300">React + TypeScript + Tailwind CSS</p>
+                </div>
+                <div class="bg-purple-800/30 p-6 rounded-lg border-l-4 border-purple-500">
+                    <h3 class="text-2xl font-bold mb-3 text-purple-300">AI Layer</h3>
+                    <p class="text-xl text-gray-300">OpenAI gpt-5-nano (シナリオ生成) + Anthropic Claude (画像生成)</p>
+                </div>
+                <div class="bg-pink-800/30 p-6 rounded-lg border-l-4 border-pink-500">
+                    <h3 class="text-2xl font-bold mb-3 text-pink-300">Multi-modal</h3>
+                    <p class="text-xl text-gray-300">MulmoCast (動画統合) + Web Speech API (音声)</p>
+                </div>
+                <div class="bg-green-800/30 p-6 rounded-lg border-l-4 border-green-500">
+                    <h3 class="text-2xl font-bold mb-3 text-green-300">Development</h3>
+                    <p class="text-xl text-gray-300">Claude Code (コード実装支援)</p>
+                </div>
+            </div>
+            <div class="mt-8 text-center text-xl text-gray-400">
+                AI駆動の開発とマルチモーダル体験
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3.5: Why These Technologies -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-purple-900 to-indigo-900 p-16">
+        <div class="max-w-6xl w-full animate-in">
+            <h2 class="text-5xl font-bold mb-12 text-center text-cyan-400">💡 なぜこの技術選択？</h2>
+            <div class="space-y-6">
+                <div class="bg-blue-900/40 p-6 rounded-lg border-l-4 border-blue-400">
+                    <div class="flex items-start">
+                        <span class="text-3xl mr-4">⚡</span>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2 text-blue-300">React + TypeScript</h3>
+                            <p class="text-lg text-gray-300">インタラクティブなUI、型安全性でバグ削減、ハッカソンの短期開発に最適</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-purple-900/40 p-6 rounded-lg border-l-4 border-purple-400">
+                    <div class="flex items-start">
+                        <span class="text-3xl mr-4">🤖</span>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2 text-purple-300">OpenAI gpt-5-nano</h3>
+                            <p class="text-lg text-gray-300">高速レスポンス（<1秒）、任意の会社・役職で動的シナリオ生成、コスト効率</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-pink-900/40 p-6 rounded-lg border-l-4 border-pink-400">
+                    <div class="flex items-start">
+                        <span class="text-3xl mr-4">🎬</span>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2 text-pink-300">MulmoCast（マルチモーダル）</h3>
+                            <p class="text-lg text-gray-300 mb-3"><span class="font-bold text-pink-200">「体験」には視覚と聴覚の統合が不可欠</span></p>
+                            <ul class="text-base text-gray-400 space-y-1">
+                                <li>• 音声（TTS）→ 臨場感のあるナレーション</li>
+                                <li>• 画像（AI生成）→ 未来の職場を視覚化</li>
+                                <li>• 動画（自動統合）→ 持ち帰れる未来体験</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-green-900/40 p-6 rounded-lg border-l-4 border-green-400">
+                    <div class="flex items-start">
+                        <span class="text-3xl mr-4">🛠️</span>
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2 text-green-300">Claude Code</h3>
+                            <p class="text-lg text-gray-300">AI支援でハッカソン期間内に高品質な実装を実現</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Technical Challenges -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-gray-900 to-purple-900 p-16">
+        <div class="max-w-6xl w-full animate-in">
+            <h2 class="text-5xl font-bold mb-12 text-center text-yellow-400">⚡ 技術的チャレンジ</h2>
+
+            <div class="mb-8 bg-yellow-900/20 p-6 rounded-lg border-2 border-yellow-600">
+                <h3 class="text-3xl font-bold mb-4 text-yellow-300">課題1: MulmoCast Context管理</h3>
+                <p class="text-xl text-gray-300 mb-4">動画生成時に「studioBeat.duration is not set」エラーが発生</p>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-red-400 font-bold mb-2">❌ 失敗したコード</p>
+                        <div class="bg-gray-900/70 p-4 rounded text-sm font-mono">
+                            <div class="text-gray-500">// 音声生成</div>
+                            <div class="text-gray-300">await audio(context);</div>
+                            <div class="text-gray-500 mt-2">// 動画生成</div>
+                            <div class="text-gray-300">await movie(context);</div>
+                            <div class="text-red-400 mt-2">// ⚠️ エラー！duration未設定</div>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2">問題：audio()の戻り値を捨てている</p>
+                    </div>
+                    <div>
+                        <p class="text-green-400 font-bold mb-2">✅ 正しいコード</p>
+                        <div class="bg-gray-900/70 p-4 rounded text-sm font-mono">
+                            <div class="text-gray-500">// 音声生成して戻り値を保存</div>
+                            <div class="text-green-300">const audioResult = await audio(context);</div>
+                            <div class="text-green-300">context = audioResult;</div>
+                            <div class="text-gray-500 mt-2">// 更新されたcontextで動画生成</div>
+                            <div class="text-gray-300">await movie(context);</div>
+                            <div class="text-green-400 mt-2">// ✅ 成功！durationあり</div>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2">解決：audio()が返すcontextにdurationが含まれる</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-purple-900/20 p-6 rounded-lg border-2 border-purple-600">
+                <h3 class="text-3xl font-bold mb-4 text-purple-300">課題2: ユーザー回答の動画反映</h3>
+                <p class="text-xl text-gray-300 mb-4">シナリオでの回答を動画に含めてパーソナライズ</p>
+
+                <div class="bg-gray-900/70 p-4 rounded text-sm font-mono mb-3">
+                    <div class="text-gray-500">// 関数定義を拡張</div>
+                    <div class="text-purple-300">const generateMulmoScript = (offer, profile, <span class="text-yellow-300">answers</span>) => {</div>
+                    <div class="text-gray-400 ml-4">// answersパラメータを追加</div>
+                    <div class="text-gray-500 mt-2 ml-4">// 条件付きでビートを追加</div>
+                    <div class="text-purple-300 ml-4">...(answers?.length > 0 ? [{</div>
+                    <div class="text-gray-300 ml-8">text: `あなたの判断: ${answers[0]}...`,</div>
+                    <div class="text-gray-300 ml-8">htmlPrompt: { /* 決断の可視化 */ }</div>
+                    <div class="text-purple-300 ml-4">}] : [])</div>
+                    <div class="text-purple-300">}</div>
+                </div>
+                <p class="text-sm text-gray-400">結果：ユーザーの実際の回答が脳・意思決定ツリーとして動画に反映</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Achievements -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-blue-900 to-green-900 p-16">
+        <div class="max-w-6xl w-full animate-in">
+            <h2 class="text-5xl font-bold mb-12 text-center text-green-400">✅ 実現できたこと</h2>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-green-800/20 p-6 rounded-lg border-2 border-green-500">
+                    <div class="text-5xl mb-3">🎬</div>
+                    <h3 class="text-2xl font-bold mb-2 text-green-300">動的AIシナリオ生成</h3>
+                    <p class="text-gray-300">任意の会社・役職で未来シナリオを生成</p>
+                </div>
+                <div class="bg-blue-800/20 p-6 rounded-lg border-2 border-blue-500">
+                    <div class="text-5xl mb-3">🎤</div>
+                    <h3 class="text-2xl font-bold mb-2 text-blue-300">音声インタラクション</h3>
+                    <p class="text-gray-300">Web Speech APIで自然な対話</p>
+                </div>
+                <div class="bg-purple-800/20 p-6 rounded-lg border-2 border-purple-500">
+                    <div class="text-5xl mb-3">🎬</div>
+                    <h3 class="text-2xl font-bold mb-2 text-purple-300">パーソナライズド動画</h3>
+                    <p class="text-gray-300">ユーザーの回答を反映した未来体験</p>
+                </div>
+                <div class="bg-pink-800/20 p-6 rounded-lg border-2 border-pink-500">
+                    <div class="text-5xl mb-3">📊</div>
+                    <h3 class="text-2xl font-bold mb-2 text-pink-300">スキル可視化</h3>
+                    <p class="text-gray-300">キーワード分析でリアルタイム表示</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Demo -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-purple-900 via-pink-900 to-orange-900">
+        <div class="text-center animate-in">
+            <h1 class="text-8xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-400">
+                デモンストレーション
+            </h1>
+            <div class="inline-block bg-red-600 text-white px-8 py-4 rounded-full text-3xl font-bold animate-pulse">
+                LIVE DEMO
+            </div>
+            <p class="mt-12 text-2xl text-gray-300">実際の動作をご覧ください</p>
+        </div>
+    </div>
+
+    <!-- Slide 7: Evaluation Criteria -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-gray-900 to-blue-900 p-16">
+        <div class="max-w-6xl w-full animate-in">
+            <h2 class="text-5xl font-bold mb-12 text-center text-blue-400">📋 評価基準との対応</h2>
+            <div class="space-y-6">
+                <div class="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 p-6 rounded-lg border-l-4 border-cyan-500">
+                    <h3 class="text-3xl font-bold mb-3">🚀 未来ビジョン度</h3>
+                    <ul class="text-xl text-gray-300 space-y-2">
+                        <li>✅ 2030年の体験型キャリア探索</li>
+                        <li>✅ 「想像」から「体験」へのパラダイムシフト</li>
+                        <li>✅ ワクワクする未来の働き方</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-r from-purple-900/50 to-pink-900/50 p-6 rounded-lg border-l-4 border-pink-500">
+                    <h3 class="text-3xl font-bold mb-3">🤖 技術的チャレンジ度</h3>
+                    <ul class="text-xl text-gray-300 space-y-2">
+                        <li>✅ OpenAI + Anthropic + MulmoCast 連携</li>
+                        <li>✅ マルチモーダル体験の統合</li>
+                        <li>✅ 音声・画像・動画のシームレス生成</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-r from-green-900/50 to-emerald-900/50 p-6 rounded-lg border-l-4 border-emerald-500">
+                    <h3 class="text-3xl font-bold mb-3">💡 具体性と実現可能性</h3>
+                    <ul class="text-xl text-gray-300 space-y-2">
+                        <li>✅ 動作するプロトタイプ完成</li>
+                        <li>✅ 実際に体験可能なデモ</li>
+                        <li>✅ 技術的課題の克服</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Closing -->
+    <div class="slide items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-orange-900">
+        <div class="text-center animate-in">
+            <h1 class="text-7xl font-bold mb-8">ありがとうございました！</h1>
+            <h2 class="text-5xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                Career Transform 2030
+            </h2>
+            <p class="text-3xl text-blue-200 mb-12">未来の働き方を、今、体験しよう。</p>
+            <div class="mt-16">
+                <p class="text-2xl text-gray-300 mb-4">Questions?</p>
+                <div class="inline-block bg-white/10 p-8 rounded-lg">
+                    <p class="text-lg text-gray-400">GitHub: atsushi-ambo/career-transform-2030</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="fixed bottom-8 right-8 flex gap-4 z-50">
+        <button onclick="prevSlide()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold text-lg">
+            ← 前
+        </button>
+        <button onclick="nextSlide()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold text-lg">
+            次 →
+        </button>
+    </div>
+
+    <div class="fixed bottom-8 left-8 text-gray-400 text-lg z-50">
+        <span id="slideCounter">1 / 9</span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>

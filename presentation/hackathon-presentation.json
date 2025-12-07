@@ -1,0 +1,58 @@
+{
+  "$mulmocast": { "version": "1.0" },
+  "canvasSize": { "width": 1920, "height": 1080 },
+  "htmlImageParams": { "provider": "anthropic" },
+  "title": "Career Transform 2030 - ハッカソン発表",
+  "description": "AIでデザインする未来の働き方",
+  "lang": "ja",
+  "beats": [
+    {
+      "text": "Career Transform 2030。AIでデザインする、未来の働き方。",
+      "htmlPrompt": {
+        "prompt": "Create a modern hackathon presentation title slide. Title: 'Career Transform 2030' in large bold text. Subtitle: 'AIでデザインする、未来の働き方' Style: Clean, professional, futuristic gradient background from deep blue to purple. Include subtle AI/neural network pattern in background. White text with glowing effect. Aspect ratio: 16:9"
+      }
+    },
+    {
+      "text": "未来ビジョン：2030年、キャリアを「想像」から「体験」へ。",
+      "htmlPrompt": {
+        "prompt": "Create a vision slide with split comparison. Left side: Traditional job search with person confused, paper resumes, grayscale, text '従来：想像するしかない'. Right side: Person experiencing future career through VR/holographic display, colorful, confident, text '未来：体験できる'. Large arrow in center showing transformation. Futuristic style, aspect ratio: 16:9"
+      }
+    },
+    {
+      "text": "技術スタック：React、TypeScript、OpenAI、Anthropic Claude、MulmoCast。音声、画像、動画をシームレスに統合。",
+      "htmlPrompt": {
+        "prompt": "Create a clean technical architecture diagram. Title: '技術スタック'. Show 3 layers: Frontend (React + TypeScript + Tailwind), AI Layer (OpenAI GPT-4o-mini + Anthropic Claude), Media Layer (MulmoCast + Web Speech API). Use simple icons and arrows showing data flow. Tech blue color scheme, professional and clear. Aspect ratio: 16:9"
+      }
+    },
+    {
+      "text": "技術的チャレンジ：MulmoCastのコンテキスト管理とユーザー回答の動画反映を実現。",
+      "htmlPrompt": {
+        "prompt": "Create a technical challenge slide. Title: '技術的チャレンジ'. Show 2 key challenges as cards: Card 1: 'MulmoCast Context管理' with code snippet showing audio() return value propagation. Card 2: 'ユーザー回答反映' with flow diagram showing answers -> MulmoScript -> personalized video. Use syntax highlighting, professional developer presentation style. Blue/purple gradient. Aspect ratio: 16:9"
+      }
+    },
+    {
+      "text": "実現できたこと：動的AIシナリオ、音声対話、パーソナライズド動画、リアルタイム分析。",
+      "htmlPrompt": {
+        "prompt": "Create an achievements slide. Title: '実現できたこと'. Show 4 feature cards with green checkmarks: 1. '動的AIシナリオ生成' with brain icon, 2. '音声インタラクション' with microphone icon, 3. 'パーソナライズド動画' with video icon, 4. 'スキル可視化' with radar chart icon. Clean grid layout, success-focused design, blue/purple gradient background. Aspect ratio: 16:9"
+      }
+    },
+    {
+      "text": "デモンストレーション：実際の動作をご覧ください。",
+      "htmlPrompt": {
+        "prompt": "Create a demo transition slide. Large bold text: 'デモンストレーション' in center. Visual: Laptop screen showing the app interface with glowing highlights. Include 'LIVE DEMO' badge with play button. Exciting and attention-grabbing design with vibrant blue and purple gradient, glowing effects. Aspect ratio: 16:9"
+      }
+    },
+    {
+      "text": "評価基準：未来ビジョン、技術チャレンジ、具体性。すべてクリア。",
+      "htmlPrompt": {
+        "prompt": "Create evaluation criteria slide. Title: '評価基準との対応'. Show 3 sections with emoji icons: 🚀 '未来ビジョン度' - 体験型キャリア探索, 🤖 '技術的チャレンジ度' - マルチモーダルAI統合, 💡 '具体性' - 動作するプロトタイプ完成. Each section with brief bullet points and green checkmarks. Professional, confident presentation style. Aspect ratio: 16:9"
+      }
+    },
+    {
+      "text": "ありがとうございました！未来の働き方を、今、体験しよう。",
+      "htmlPrompt": {
+        "prompt": "Create a closing slide. Large text: 'ありがとうございました！' Subtitle: 'Career Transform 2030'. Tagline: '未来の働き方を、今、体験しよう。' Visual: Person stepping confidently into bright future with holographic career paths. Include QR code placeholder and 'Questions?' text. Inspiring design with warm gradient from blue to orange/gold. Aspect ratio: 16:9"
+      }
+    }
+  ]
+}
